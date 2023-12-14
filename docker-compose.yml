@@ -1,0 +1,21 @@
+version: '3.6'
+
+services:
+  web:
+    container_name: 'web'
+    image: test
+    expose:
+      - 3000
+    restart: always
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.upload.rule=HOST(`web.localhost`)'
+      - 'traefik.http.routers.upload.entrypoints=web'
+      - 'traefik.http.services.upload.loadbalancer.server.port=3000'
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
