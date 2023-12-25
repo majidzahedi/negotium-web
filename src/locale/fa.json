@@ -1,0 +1,9 @@
+{
+  "translation": {
+    "languages": {
+      "fa": "فارسی",
+      "en": "انگلیسی"
+    },
+    "headerTitle": "نام نرم افزار من {{appName}}"
+  }
+}

@@ -4,6 +4,7 @@ import { useRefreshToken } from './use-refresh-token';
 
 import { useToken } from '@/hooks/use-token';
 import { apiAuth } from '@/lib/axios';
+import { toast } from 'sonner';
 
 export const useApiAuth = () => {
   const { token } = useToken();
@@ -27,6 +28,7 @@ export const useApiAuth = () => {
         const prevRequest = error?.config;
 
         if (error?.response?.status === 401 && !prevRequest?.sent) {
+          toast.error('Try To Refresh!', { position: 'top-left' });
           prevRequest.sent = true;
           await refreshToken();
           prevRequest.headers['Authorization'] = `Bearer ${token?.accessToken}`;

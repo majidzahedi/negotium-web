@@ -1,11 +1,13 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { ThemeProvider } from '@/components/providers/theme-provider.provider';
 import { ReactQueryProvider } from '@/components/providers/react-query.provider';
+import { ThemeProvider } from '@/components/providers/theme-provider.provider';
 
+import LoginPage from '@/pages/login/page';
 import RootLayout from '@/pages/root.layout';
 import RootPage from '@/pages/root.page';
-import LoginPage from '@/pages/login/page';
+import { NextUiProvider } from './components/providers/next-ui.provider';
+import { Toaster } from './components/ui/Toaster';
 import PrivateLayout from './pages/private/private-layout';
 
 const router = createBrowserRouter([
@@ -35,9 +37,12 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ThemeProvider>
-      <ReactQueryProvider>
-        <RouterProvider router={router} />
-      </ReactQueryProvider>
+      <NextUiProvider>
+        <ReactQueryProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </ReactQueryProvider>
+      </NextUiProvider>
     </ThemeProvider>
   );
 }

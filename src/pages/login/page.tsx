@@ -2,11 +2,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
+import { User } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -17,6 +25,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
+import { getMusicList } from '@/hooks/get-music-list';
 import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
 
@@ -49,6 +58,9 @@ export default function Login() {
         navigate('/');
       }
     },
+    onError: (e) => {
+      form.setError('password', { message: e.message });
+    },
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -71,6 +83,10 @@ export default function Login() {
     mutate(data);
   }
 
+  async function handleGoogleLogin() {
+    console.log(await getMusicList('/home/majid/Music'));
+  }
+
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
       <Card className="w-full max-w-lg">
@@ -79,7 +95,6 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <Toaster />
             <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-6">
               <FormField
                 control={form.control}
@@ -116,7 +131,17 @@ export default function Login() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <CardFooter className="space-x-8 p-0">
+                <Button type="submit">Submit</Button>
+                <Button
+                  onClick={handleGoogleLogin}
+                  type="button"
+                  className="space-x-2"
+                >
+                  <User className="h-4 w-4" />
+                  <span>Google</span>
+                </Button>
+              </CardFooter>
             </form>
           </Form>
         </CardContent>

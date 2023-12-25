@@ -1,0 +1,9 @@
+{
+  "translation": {
+    "languages": {
+      "fa": "persian",
+      "en": "English"
+    },
+    "headerTitle": "My {{appName}} Header Title"
+  }
+}
