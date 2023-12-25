@@ -30,7 +30,7 @@ function RootPage() {
     return () => clearInterval(interval);
   }, []);
   const promise = () =>
-    new Promise((resolve) =>
+    new Promise<{ name: string }>((resolve) =>
       setTimeout(() => resolve({ name: 'Sonner' }), 2000),
     );
 
@@ -40,17 +40,14 @@ function RootPage() {
         <CircularProgress classNames={{ svg: 'w-4 h-4' }} value={value} />
       ),
       success: (data) => {
-        return `${data.name} toast has been added!`;
+        return `${data?.name} toast has been added!`;
       },
       error: 'Error',
       position: 'top-right',
     });
   };
 
-  const {
-    t,
-    i18n: { changeLanguage, language },
-  } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <section className="flex h-[100dvh] w-full flex-col items-center justify-center space-y-4">
