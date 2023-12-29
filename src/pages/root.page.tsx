@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useApiAuth } from '@/hooks/use-api-auth';
-import { CircularProgress } from '@nextui-org/react';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -20,11 +19,9 @@ function RootPage() {
     select: (data) => data.data,
   });
 
-  const [value, setValue] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setValue((v) => (v >= 100 ? 0 : v + 10));
     }, 500);
 
     return () => clearInterval(interval);
@@ -36,9 +33,6 @@ function RootPage() {
 
   const download = () => {
     toast.promise(promise, {
-      loading: (
-        <CircularProgress classNames={{ svg: 'w-4 h-4' }} value={value} />
-      ),
       success: (data) => {
         return `${data?.name} toast has been added!`;
       },
@@ -60,13 +54,6 @@ function RootPage() {
         {t('headerTitle', { appName: 'App for Translations' })}
       </h1>
       <Button variant="outline" onClick={download}>
-        <CircularProgress
-          aria-label="loading"
-          color="danger"
-          className="mr-2"
-          classNames={{ svg: 'w-4 h-4' }}
-          value={value}
-        />
         <span>Start Download</span>
       </Button>
     </section>

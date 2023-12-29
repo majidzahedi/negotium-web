@@ -22,9 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 
-import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
 
 interface loginResponse {
@@ -33,25 +31,19 @@ interface loginResponse {
 }
 
 const FormSchema = z.object({
-  mobile: z.string().min(2, {
+  mobile: z.string().min(11, {
     message: 'Invalid mobile fromat',
   }),
 });
 
-export default function Login() {
+export default function RequestCode() {
   const navigate = useNavigate();
-  const { setToken, token } = useToken();
   const { mutate } = useMutation({
-    mutationKey: ['login'],
+    mutationKey: ['request-code'],
     mutationFn: (body: z.infer<typeof FormSchema>) =>
       api.post<loginResponse>('auth/code', body),
-    onSuccess: (data) => {
-      setToken(data.data);
-    },
-    onSettled: () => {
-      if (token?.accessToken) {
-        navigate('/');
-      }
+    onSuccess: (_, { mobile }) => {
+      navigate(`/login/verify-code?mobile=${mobile}`);
     },
     onError: (e) => {
       form.setError('mobile', { message: e.message });
@@ -74,7 +66,7 @@ export default function Login() {
       ),
     });
 
-    mutate(data);
+    mutate({ mobile: data.mobile.replace('+98', '0') });
   }
 
   return (
@@ -91,7 +83,7 @@ export default function Login() {
                 name="mobile"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='-mb-3'>mobile</FormLabel>
+                    <FormLabel className="-mb-3">mobile</FormLabel>
                     <FormControl>
                       <PhoneInput
                         {...field}

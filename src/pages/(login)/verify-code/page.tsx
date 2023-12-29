@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { PhoneInput } from 'react-international-phone';
+import PinInput from 'react-pin-input';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 
 import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
@@ -33,18 +32,19 @@ interface loginResponse {
 }
 
 const FormSchema = z.object({
+  code: z.string(),
   mobile: z.string().min(2, {
     message: 'Invalid mobile fromat',
   }),
 });
 
-export default function Login() {
+export default function VerifyCode() {
   const navigate = useNavigate();
   const { setToken, token } = useToken();
   const { mutate } = useMutation({
     mutationKey: ['login'],
     mutationFn: (body: z.infer<typeof FormSchema>) =>
-      api.post<loginResponse>('auth/code', body),
+      api.post<loginResponse>('auth/login', body),
     onSuccess: (data) => {
       setToken(data.data);
     },
@@ -58,10 +58,13 @@ export default function Login() {
     },
   });
 
+  const [params] = useSearchParams();
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      mobile: '',
+      code: '',
+      mobile: params.get('mobile') as string,
     },
   });
 
@@ -88,15 +91,26 @@ export default function Login() {
             <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-6">
               <FormField
                 control={form.control}
-                name="mobile"
+                name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='-mb-3'>mobile</FormLabel>
+                    <FormLabel className="">code</FormLabel>
                     <FormControl>
-                      <PhoneInput
+                      <PinInput
+                        length={6}
+                        style={{
+                          display: 'flex',
+                          height: '40px',
+                        }}
+                        inputStyle={{
+                          height: '40px',
+                          width: '40px',
+                          borderRadius: 'var(--radius)',
+                          padding: '8px 12px',
+                          fontSize: '14px',
+                        }}
                         {...field}
-                        inputClassName="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        defaultCountry="ir"
+                        onComplete={() => form.handleSubmit(onSubmit)()}
                       />
                     </FormControl>
                     <FormMessage />
