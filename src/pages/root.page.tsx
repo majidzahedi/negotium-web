@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useApiAuth } from '@/hooks/use-api-auth';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -19,13 +18,6 @@ function RootPage() {
     select: (data) => data.data,
   });
 
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
   const promise = () =>
     new Promise<{ name: string }>((resolve) =>
       setTimeout(() => resolve({ name: 'Sonner' }), 2000),

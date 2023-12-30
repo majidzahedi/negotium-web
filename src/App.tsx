@@ -9,6 +9,8 @@ import { Toaster } from './components/ui/Toaster';
 import PrivateLayout from './pages/private/private-layout';
 import RequestCode from './pages/(login)/request-code/page';
 import VerifyCode from './pages/(login)/verify-code/page';
+import { NextUiProvider } from './components/providers/next-ui.provider';
+import { LoginLayout } from './pages/(login)/layout';
 
 const router = createBrowserRouter([
   {
@@ -30,7 +32,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <Outlet />,
+    element: <LoginLayout/>,
     children: [
       {
         path: 'request-code',
@@ -48,10 +50,12 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ThemeProvider>
+      <NextUiProvider>
       <ReactQueryProvider>
         <RouterProvider router={router} />
         <Toaster />
       </ReactQueryProvider>
+      </NextUiProvider>
     </ThemeProvider>
   );
 }

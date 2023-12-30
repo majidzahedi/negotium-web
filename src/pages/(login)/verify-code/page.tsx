@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import PinInput from 'react-pin-input';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import PinInput from 'react-pin-input';
 
 import { Button } from '@/components/ui/button';
 import {

@@ -1,12 +1,17 @@
+import { Minimize2, Upload, X } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 
 import { MenubarDemo } from '@/components/MenubarDemo';
+import { ModalProvider } from '@/components/providers/modals.provider';
 import { Button } from '@/components/ui/button';
-import { Minimize2, X } from 'lucide-react';
+import { useModal } from '@/hooks/use-modal.hook';
 
 function RootLayout() {
+  const { onOpen } = useModal();
+
   return (
     <main className="flex min-h-[100dvh] w-full ">
+      <ModalProvider />
       <MenubarDemo />
       <div className="fixed right-0 top-0 flex h-9 items-center  ">
         <Button variant="ghost">
@@ -20,6 +25,13 @@ function RootLayout() {
         </Button>
       </div>
       <Outlet />
+      <Button
+        size="icon"
+        onClick={() => onOpen('upload')}
+        className="fixed bottom-2 left-2 h-7 w-7 rounded-full"
+      >
+        <Upload className="h-4 w-4" />
+      </Button>
     </main>
   );
 }
