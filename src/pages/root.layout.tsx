@@ -5,9 +5,11 @@ import { MenubarDemo } from '@/components/MenubarDemo';
 import { ModalProvider } from '@/components/providers/modals.provider';
 import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/use-modal.hook';
+import { useUpload } from '@/hooks/use-upload';
 
 function RootLayout() {
   const { onOpen } = useModal();
+  useUpload();
 
   return (
     <main className="flex min-h-[100dvh] w-full ">
