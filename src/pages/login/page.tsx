@@ -22,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 
 import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
@@ -91,7 +90,7 @@ export default function Login() {
                 name="mobile"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='-mb-3'>mobile</FormLabel>
+                    <FormLabel className="-mb-3">mobile</FormLabel>
                     <FormControl>
                       <PhoneInput
                         {...field}
