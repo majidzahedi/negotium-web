@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "dev:tauri": "vite --config vite.config.tauri.ts",
+    "build:tauri": "vite build --config vite.config.tauri.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --loglevel warn --write \"src/**/*.{jsx,js,ts,tsx}\"",
     "preview": "vite preview"
