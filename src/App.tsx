@@ -11,6 +11,7 @@ import RequestCode from './pages/(login)/request-code/page';
 import VerifyCode from './pages/(login)/verify-code/page';
 import { NextUiProvider } from './components/providers/next-ui.provider';
 import { LoginLayout } from './pages/(login)/layout';
+import { UrqlProvider } from './components/providers/urql.provider';
 
 const router = createBrowserRouter([
   {
@@ -52,8 +53,10 @@ function App() {
     <ThemeProvider>
       <NextUiProvider>
         <ReactQueryProvider>
-          <RouterProvider router={router} />
-          <Toaster />
+          <UrqlProvider>
+            <RouterProvider router={router} />
+            <Toaster />
+          </UrqlProvider>
         </ReactQueryProvider>
       </NextUiProvider>
     </ThemeProvider>

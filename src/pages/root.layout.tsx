@@ -6,10 +6,12 @@ import { ModalProvider } from '@/components/providers/modals.provider';
 import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/use-modal.hook';
 import { useUpload } from '@/hooks/use-upload';
+import { notificationService } from '@/services/notification.service';
 
 function RootLayout() {
   const { onOpen } = useModal();
   useUpload();
+  notificationService();
 
   return (
     <main className="flex min-h-[100dvh] w-full ">
