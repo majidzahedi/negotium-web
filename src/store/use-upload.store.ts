@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { Uploader, ProgressInfo } from '@/lib/uploader';
+import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 
 type UploadFile = {
   id: string;
@@ -8,7 +10,7 @@ type UploadFile = {
   url: string | null;
   status: 'initiated' | 'started' | 'finished' | 'error';
   progress: ProgressInfo;
-  error: Error | null;
+  error: AxiosError | null;
 };
 
 type UploaderClass = {
@@ -16,12 +18,14 @@ type UploaderClass = {
   uploader: any;
 };
 
+type UploadType = 'avatar';
+
 interface useUploadStore {
   uploaders: UploaderClass[];
   files: UploadFile[];
   concurrentUploads: number;
   addConcurrentUpload: () => void;
-  addUploads: (files: File[]) => void;
+  addUploads: (files: File[], type: UploadType) => void;
   editFile: (id: string, data: Partial<UploadFile>) => void;
 }
 
@@ -31,7 +35,7 @@ export const useUploadStore = create<useUploadStore>((set, get) => ({
   concurrentUploads: 0,
   addConcurrentUpload: () =>
     set((state) => ({ concurrentUploads: state.concurrentUploads + 1 })),
-  addUploads: (files) => {
+  addUploads: (files, type) => {
     files.map((file) => {
       const id = nanoid();
       const newFile: UploadFile = {
@@ -44,7 +48,7 @@ export const useUploadStore = create<useUploadStore>((set, get) => ({
       };
 
       // @ts-ignore
-      const uploader = new Uploader({ file });
+      const uploader = new Uploader({ file, path: type });
 
       uploader
         .onInitialize(() => {
@@ -61,7 +65,7 @@ export const useUploadStore = create<useUploadStore>((set, get) => ({
           }));
         })
         .onError((error) => {
-          get().editFile(id, { error, status: 'error' });
+          get().editFile(id, { error: error as AxiosError, status: 'error' });
           set((state) => ({
             concurrentUploads: state.concurrentUploads - 1,
           }));

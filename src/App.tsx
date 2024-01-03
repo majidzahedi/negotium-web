@@ -55,7 +55,7 @@ function App() {
         <ReactQueryProvider>
           <UrqlProvider>
             <RouterProvider router={router} />
-            <Toaster />
+            <Toaster position="top-right" />
           </UrqlProvider>
         </ReactQueryProvider>
       </NextUiProvider>

@@ -27,6 +27,11 @@ export const useApiAuth = () => {
       async function (error) {
         const prevRequest = error?.config;
 
+        if (error?.response?.status === 400 && !prevRequest?.sent) {
+          console.log('error');
+          toast.error(error?.response?.data?.message);
+        }
+
         if (error?.response?.status === 401 && !prevRequest?.sent) {
           toast.error('Try To Refresh!', { position: 'top-left' });
           prevRequest.sent = true;

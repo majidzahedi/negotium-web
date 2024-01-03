@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useUploadStore } from '@/store/use-upload.store';
+import { useApiAuth } from './use-api-auth';
 
 export const useUpload = () => {
   const {
@@ -10,6 +11,8 @@ export const useUpload = () => {
     addConcurrentUpload,
   } = useUploadStore();
 
+  const api = useApiAuth();
+
   useEffect(() => {
     const readyToUpload = files.filter((file) => file.status === 'initiated');
 
@@ -19,7 +22,7 @@ export const useUpload = () => {
 
       if (uploader) {
         addConcurrentUpload();
-        uploader.start();
+        uploader.start(api);
       }
     });
   }, [uploaders, files, concurrentUploads]);

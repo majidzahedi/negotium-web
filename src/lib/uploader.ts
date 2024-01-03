@@ -1,5 +1,5 @@
 // TODO:  make it a hook maybe??
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_UPLOAD_URL || 'http://upload.localhost',
@@ -39,6 +39,7 @@ interface UploaderOptions {
   chunkSize?: number;
   threadsQuantity?: number;
   file: File;
+  path: string;
   metadata?: any; // Adjust the type as needed
   onProgress: (progress: ProgressInfo) => void;
   onError: (error: Error) => void;
@@ -61,12 +62,13 @@ export class Uploader {
   private fileKey: string | null;
   private mime: string;
   private size: number;
-  private path: string = '';
+  private path: string;
   private ext: string;
   private onProgressFn: (progress: ProgressInfo) => void;
   private onErrorFn: (error: Error) => void;
   private onCompletedFn: (response: string) => void;
   private onInitializeFn: (file: any) => void;
+  private api: AxiosInstance = api;
 
   constructor(options: UploaderOptions) {
     this.chunkSize = options.chunkSize || 1024 * 1024 * 5;
@@ -83,6 +85,7 @@ export class Uploader {
     this.fileKey = null;
     this.mime = options.file.type;
     this.size = options.file.size;
+    this.path = options.path;
     this.ext = options.file.name.split('.').pop() || '';
     this.onProgressFn = options.onProgress;
     this.onErrorFn = options.onError;
@@ -90,7 +93,8 @@ export class Uploader {
     this.onInitializeFn = options.onInitialize;
   }
 
-  start(): void {
+  start(api: AxiosInstance): void {
+    this.api = api;
     this.initialize();
   }
 
@@ -107,7 +111,7 @@ export class Uploader {
         parts: numberOfParts,
       };
 
-      const urlsResponse = await api.request<UploadStartReturnType>({
+      const urlsResponse = await this.api.request<UploadStartReturnType>({
         url: '/upload/start',
         method: 'POST',
         data: AWSMultipartFileDataInput,
@@ -191,7 +195,7 @@ export class Uploader {
           parts: this.uploadedParts,
         };
 
-        const response = await api.request({
+        const response = await this.api.request({
           url: '/upload/finish',
           method: 'POST',
           data: finalizeMultipartInput,

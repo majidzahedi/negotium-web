@@ -9,12 +9,12 @@ import { useUploadStore } from '@/store/use-upload.store';
 export const Uploader = () => {
   const { addUploads } = useUploadStore();
   const onDrop = useCallback((acceptedFiles: any) => {
-    addUploads(acceptedFiles);
+    addUploads(acceptedFiles, 'avatar');
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'image/png': [], 'image/jpeg': [] },
+    accept: { 'image/jpeg': [], 'image/png': [] },
   });
 
   return (
