@@ -77,49 +77,52 @@ export const UploadModal = () => {
         <DrawerContent>
           <div className="grid w-full grid-cols-4 gap-2 p-2 sm:gap-4 ">
             {files?.map((file) => (
-              <div
-                key={file.id}
-                className="relative flex w-full items-center space-x-2 overflow-hidden rounded-lg "
-              >
-                <div className="relative aspect-square ">
-                  <div
-                    className={cn(
-                      'index-0  absolute m-auto h-full w-full rounded-lg ',
-                      file.status !== 'finished'
-                        ? 'bg-background/40 '
-                        : 'backdrop-blur-0',
-                    )}
-                  />
-                  {file.status !== 'finished' && (
-                    <CircularProgress
-                      value={file.progress.percentage}
-                      aria-label="uploading..."
-                      className="absolute  inset-0 m-auto h-full w-full "
-                      classNames={{
-                        svg: 'w-full h-full rop-shadow-md',
-                        indicator: 'stroke-foreground',
-                        track: 'stroke-foreground/10',
-                        value: 'text-2xl font-semibold text-foreground',
-                      }}
-                      strokeWidth={3}
-                      showValueLabel={true}
-                    />
-                  )}
-                  <img
-                    className="aspect-square h-full w-full rounded-lg object-cover"
-                    src={
-                      file.status !== 'finished'
-                        ? (file.path as string)
-                        : (file.url as string)
-                    }
-                    alt=""
-                  />
-                </div>
-              </div>
+              <UploadPlaceholder file={file} key={file.id} />
             ))}
             <Uploader />
           </div>
         </DrawerContent>
       </Drawer>
     );
+};
+
+export const UploadPlaceholder = ({ file }: { file: any }) => {
+  return (
+    <div className="relative flex w-full items-center space-x-2 overflow-hidden rounded-lg ">
+      <div className="relative aspect-square ">
+        <div
+          className={cn(
+            'index-0  absolute m-auto h-full w-full rounded-lg ',
+            file?.status !== 'finished'
+              ? 'bg-background/40 '
+              : 'backdrop-blur-0',
+          )}
+        />
+        {file.status !== 'finished' && (
+          <CircularProgress
+            value={file?.progress?.percentage}
+            aria-label="uploading..."
+            className="absolute  inset-0 m-auto h-full w-full "
+            classNames={{
+              svg: 'w-full h-full rop-shadow-md',
+              indicator: 'stroke-foreground',
+              track: 'stroke-foreground/10',
+              value: 'text-2xl font-semibold text-foreground',
+            }}
+            strokeWidth={3}
+            showValueLabel={true}
+          />
+        )}
+        <img
+          className="aspect-square h-full w-full rounded-lg object-cover"
+          src={
+            file?.status !== 'finished'
+              ? (file.path as string)
+              : (file.url as string)
+          }
+          alt=""
+        />
+      </div>
+    </div>
+  );
 };

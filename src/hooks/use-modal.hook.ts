@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type modalTypes = 'upload';
+type modalTypes = 'upload' | 'FirstLoginModal';
 
 interface useModalProp {
   isOpen: boolean;
@@ -10,8 +10,8 @@ interface useModalProp {
 }
 
 export const useModal = create<useModalProp>((set) => ({
-  isOpen: false,
-  type: null,
+  isOpen: true,
+  type: 'FirstLoginModal',
   onOpen: (type) => set({ isOpen: true, type }),
   onClose: () => set({ isOpen: false, type: null }),
 }));

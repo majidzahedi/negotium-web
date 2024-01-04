@@ -1,8 +1,10 @@
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { Upload } from 'lucide-react';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
 import { cn } from '@/lib/utils';
 import { useUploadStore } from '@/store/use-upload.store';
 
