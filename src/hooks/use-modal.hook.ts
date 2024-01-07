@@ -10,8 +10,8 @@ interface useModalProp {
 }
 
 export const useModal = create<useModalProp>((set) => ({
-  isOpen: true,
-  type: 'FirstLoginModal',
+  isOpen: false,
+  type: null,
   onOpen: (type) => set({ isOpen: true, type }),
   onClose: () => set({ isOpen: false, type: null }),
 }));

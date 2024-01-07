@@ -129,7 +129,6 @@ const InnerComponent = ({ form, onSubmit }: any) => (
           </FormControl>
         )}
       />
-      <button hidden />
     </form>
   </Form>
 );
