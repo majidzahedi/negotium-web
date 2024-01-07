@@ -1,8 +1,14 @@
+import { FileRoute } from '@tanstack/react-router';
+
 import { useApiAuth } from '@/hooks/use-api-auth';
 import { useModal } from '@/hooks/use-modal.hook';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+
+export const Route = new FileRoute('/_auth/').createRoute({
+  component: ProfileComponent,
+});
 
 type User = {
   id: number;
@@ -11,7 +17,7 @@ type User = {
   isFirstLogin: boolean;
 };
 
-function RootPage() {
+function ProfileComponent() {
   const api = useApiAuth();
   const { onOpen } = useModal();
 
@@ -37,5 +43,3 @@ function RootPage() {
     </section>
   );
 }
-
-export default RootPage;

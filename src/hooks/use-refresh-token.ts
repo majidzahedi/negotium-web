@@ -1,5 +1,5 @@
 import { useToken } from '@/hooks/use-token';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { api } from '@/lib/axios';
 
 export const useRefreshToken = () => {

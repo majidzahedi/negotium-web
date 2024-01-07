@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { PhoneInput } from 'react-international-phone';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { PhoneInput } from 'react-international-phone';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -23,8 +22,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
+import { FileRoute, useNavigate } from '@tanstack/react-router';
+
+export const Route = new FileRoute('/login/request-code').createRoute({
+  component: RequestCode,
+});
 
 interface loginResponse {
   accessToken: string;
@@ -32,25 +35,19 @@ interface loginResponse {
 }
 
 const FormSchema = z.object({
-  mobile: z.string().min(2, {
+  mobile: z.string().min(11, {
     message: 'Invalid mobile fromat',
   }),
 });
 
-export default function Login() {
+function RequestCode() {
   const navigate = useNavigate();
-  const { setToken, token } = useToken();
   const { mutate } = useMutation({
-    mutationKey: ['login'],
+    mutationKey: ['request-code'],
     mutationFn: (body: z.infer<typeof FormSchema>) =>
       api.post<loginResponse>('auth/code', body),
-    onSuccess: (data) => {
-      setToken(data.data);
-    },
-    onSettled: () => {
-      if (token?.accessToken) {
-        navigate('/');
-      }
+    onSuccess: (_, { mobile }) => {
+      navigate({ to: `/login/verify-code`, search: { mobile } });
     },
     onError: (e) => {
       form.setError('mobile', { message: e.message });
@@ -73,7 +70,7 @@ export default function Login() {
       ),
     });
 
-    mutate(data);
+    mutate({ mobile: data.mobile.replace('+98', '0') });
   }
 
   return (

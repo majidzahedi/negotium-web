@@ -1,52 +1,62 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
 import { ReactQueryProvider } from '@/components/providers/react-query.provider';
 import { ThemeProvider } from '@/components/providers/theme-provider.provider';
 
-import RootLayout from '@/pages/root.layout';
-import RootPage from '@/pages/root.page';
 import { Toaster } from './components/ui/Toaster';
-import PrivateLayout from './pages/private/private-layout';
-import RequestCode from './pages/(login)/request-code/page';
-import VerifyCode from './pages/(login)/verify-code/page';
 import { NextUiProvider } from './components/providers/next-ui.provider';
-import { LoginLayout } from './pages/(login)/layout';
 import { UrqlProvider } from './components/providers/urql.provider';
+import { Router, RouterProvider } from '@tanstack/react-router';
 
-const router = createBrowserRouter([
-  {
-    id: 'protected-layout',
-    element: <PrivateLayout />,
-    children: [
-      {
-        id: 'index-layout',
-        path: '/',
-        element: <RootLayout />,
-        children: [
-          {
-            index: true,
-            element: <RootPage />,
-          },
-        ],
-      },
-    ],
+import { routeTree } from './routeTree.gen';
+
+// const router = createBrowserRouter([
+//   {
+//     id: 'protected-layout',
+//     element: <PrivateLayout />,
+//     children: [
+//       {
+//         id: 'index-layout',
+//         path: '/',
+//         element: <RootLayout />,
+//         children: [
+//           {
+//             index: true,
+//             element: <RootPage />,
+//           },
+//         ],
+//       },
+//     ],
+//   },
+//   {
+//     path: '/login',
+//     element: <LoginLayout />,
+//     children: [
+//       {
+//         path: 'request-code',
+//         element: <RequestCode />,
+//         index: true,
+//       },
+//       {
+//         path: 'verify-code',
+//         element: <VerifyCode />,
+//       },
+//     ],
+//   },
+// ]);
+// Set up a Router instance
+const router = new Router({
+  routeTree,
+  context: {
+    auth: undefined!, // We'll inject this when we render
   },
-  {
-    path: '/login',
-    element: <LoginLayout />,
-    children: [
-      {
-        path: 'request-code',
-        element: <RequestCode />,
-        index: true,
-      },
-      {
-        path: 'verify-code',
-        element: <VerifyCode />,
-      },
-    ],
-  },
-]);
+  defaultPreload: 'intent',
+});
+
+// Register things for typesafety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 function App() {
   return (

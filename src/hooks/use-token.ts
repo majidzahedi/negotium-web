@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface AuthProp {
+export interface AuthProp {
   token: Token | null;
   setToken: (token: Token) => void;
   clearToken: () => void;
