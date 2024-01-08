@@ -1,12 +1,17 @@
 import { FileRoute } from '@tanstack/react-router';
 
-import { useApiAuth } from '@/hooks/use-api-auth';
-import { useModal } from '@/hooks/use-modal.hook';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { apiAuth } from '@/lib/axios';
+
+const whoAmI = () =>
+  queryOptions({
+    queryKey: ['whoAmI'],
+    queryFn: () => apiAuth.get<User>('/user'),
+    select: (res) => res.data,
+  });
 
 export const Route = new FileRoute('/_auth/').createRoute({
+  loader: ({ context }) => context.queryClient.ensureQueryData(whoAmI()),
   component: ProfileComponent,
 });
 
@@ -18,28 +23,13 @@ type User = {
 };
 
 function ProfileComponent() {
-  const api = useApiAuth();
-  const { onOpen } = useModal();
+  const whoAmIQuery = useSuspenseQuery(whoAmI());
 
-  const { data: user, isPending } = useQuery({
-    queryKey: ['whoAmI'],
-    queryFn: () => api.get<User>('/user'),
-    select: (res) => res.data,
-  });
-
-  useEffect(() => {
-    if (user?.isFirstLogin) {
-      onOpen('FirstLoginModal');
-    }
-  }, [user?.isFirstLogin]);
+  const user = whoAmIQuery.data;
 
   return (
     <section className="flex h-[100dvh] w-full flex-col items-center justify-center space-y-4">
-      {!isPending ? (
-        <p className="text-3xl">{user?.mobile}</p>
-      ) : (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      )}
+      {user.name}
     </section>
   );
 }

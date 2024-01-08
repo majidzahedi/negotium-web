@@ -1,4 +1,3 @@
-import { ReactQueryProvider } from '@/components/providers/react-query.provider';
 import { ThemeProvider } from '@/components/providers/theme-provider.provider';
 
 import { Toaster } from './components/ui/Toaster';
@@ -7,46 +6,16 @@ import { UrqlProvider } from './components/providers/urql.provider';
 import { Router, RouterProvider } from '@tanstack/react-router';
 
 import { routeTree } from './routeTree.gen';
+import { useToken } from './hooks/use-token';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// const router = createBrowserRouter([
-//   {
-//     id: 'protected-layout',
-//     element: <PrivateLayout />,
-//     children: [
-//       {
-//         id: 'index-layout',
-//         path: '/',
-//         element: <RootLayout />,
-//         children: [
-//           {
-//             index: true,
-//             element: <RootPage />,
-//           },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     path: '/login',
-//     element: <LoginLayout />,
-//     children: [
-//       {
-//         path: 'request-code',
-//         element: <RequestCode />,
-//         index: true,
-//       },
-//       {
-//         path: 'verify-code',
-//         element: <VerifyCode />,
-//       },
-//     ],
-//   },
-// ]);
-// Set up a Router instance
+export const queryClient = new QueryClient();
+
 const router = new Router({
   routeTree,
   context: {
     auth: undefined!, // We'll inject this when we render
+    queryClient,
   },
   defaultPreload: 'intent',
 });
@@ -59,15 +28,17 @@ declare module '@tanstack/react-router' {
 }
 
 function App() {
+  const auth = useToken();
+
   return (
     <ThemeProvider>
       <NextUiProvider>
-        <ReactQueryProvider>
+        <QueryClientProvider client={queryClient}>
           <UrqlProvider>
-            <RouterProvider router={router} />
+            <RouterProvider router={router} context={{ auth }} />
             <Toaster position="top-right" />
           </UrqlProvider>
-        </ReactQueryProvider>
+        </QueryClientProvider>
       </NextUiProvider>
     </ThemeProvider>
   );

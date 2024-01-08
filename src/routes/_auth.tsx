@@ -2,18 +2,24 @@ import { MenubarDemo } from '@/components/MenubarDemo';
 import { ModalProvider } from '@/components/providers/modals.provider';
 import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/use-modal.hook';
+import { useToken } from '@/hooks/use-token';
 import { useUpload } from '@/hooks/use-upload';
 import { notificationService } from '@/services/notification.service';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { FileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { Minimize2, Upload, X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export const Route = new FileRoute('/_auth').createRoute({
   // Before loading, authenticate the user via our auth context
   // This will also happen during prefetching (e.g. hovering over links, etc)
-  beforeLoad: ({ location }) => {
+  beforeLoad: ({ context, location }) => {
     // If the user is logged out, redirect them to the login page
-    if (false) {
+
+    const accessToken = context.auth.token?.accessToken;
+
+    if (!accessToken) {
       throw redirect({
         to: '/login',
         search: {
@@ -34,10 +40,17 @@ export const Route = new FileRoute('/_auth').createRoute({
 });
 
 export function RootComponent() {
+  const { auth } = Route.useRouteContext();
   const { onOpen } = useModal();
+
+  const { token } = useToken();
 
   useUpload();
   notificationService();
+
+  useEffect(() => {
+    auth.setToken(token);
+  }, [token]);
 
   return (
     <main className="flex min-h-[100dvh] w-full ">
@@ -63,6 +76,7 @@ export function RootComponent() {
         <Upload className="h-4 w-4" />
       </Button>
       <TanStackRouterDevtools />
+      <ReactQueryDevtools />
     </main>
   );
 }
