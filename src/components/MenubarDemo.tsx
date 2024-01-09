@@ -42,8 +42,8 @@ export function MenubarDemo({ user }: { user: User }) {
   const { onOpen } = useModal();
 
   return (
-    <div dir="ltr">
-      <Menubar className="w-full border-none">
+    <div>
+      <Menubar dir="rtl" className="w-full border-none rtl:right-0">
         <Avatar src={user.imageUrl} name={user.name} size="sm" />
         <MenubarMenu>
           <MenubarTrigger>File</MenubarTrigger>

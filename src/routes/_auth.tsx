@@ -59,13 +59,16 @@ export function RootComponent() {
             {agencies.map((agent) => (
               <Link
                 to="/$agencyId"
-                params={{ agencyId: agent.agency.agencyId }}
-                className="flex items-center space-x-4"
+                params={{ agencyId: agent?.agency?.agencyId }}
+                className="flex items-center space-x-4 rtl:space-x-reverse"
                 key={agent.id}
               >
-                <Avatar src={agent.agency.imageUrl} name={agent.agency.name} />
-                <p>{agent.agency.name}</p>
-                <p>{agent.role}</p>
+                <Avatar
+                  src={agent?.agency?.imageUrl}
+                  name={agent?.agency?.name}
+                />
+                <p>{agent?.agency?.name}</p>
+                <p>{agent?.role}</p>
               </Link>
             ))}
           </div>
