@@ -14,12 +14,17 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar';
 import { useTheme } from '@/hooks/use-theme.hook';
-import { Languages, Moon, Sun } from 'lucide-react';
+import { User } from '@/lib/query-options';
+import { Avatar } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Separator } from './ui/separator';
+import { useModal } from '@/hooks/use-modal.hook';
+import { Theme } from '@/components/providers/theme-provider.provider';
 
-export function MenubarDemo() {
-  const { setTheme } = useTheme();
+export function MenubarDemo({ user }: { user: User }) {
+  const themes: Theme[] = ['light', 'dark', 'system'];
+  const { setTheme, theme: currentTheme } = useTheme();
   const {
     t,
     i18n: { changeLanguage, language },
@@ -34,36 +39,12 @@ export function MenubarDemo() {
     updateHtmlAttributes();
   }, [language]);
 
+  const { onOpen } = useModal();
+
   return (
     <div dir="ltr">
-      <Menubar className="fixed left-0 border-none">
-        <MenubarMenu>
-          <MenubarTrigger>
-            <Sun className="h-4 w-4 rotate-0 scale-100 p-0 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 p-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </MenubarTrigger>
-          <MenubarContent>
-            <MenubarItem onClick={() => setTheme('light')}>Light</MenubarItem>
-            <MenubarItem onClick={() => setTheme('dark')}>Dark</MenubarItem>
-            <MenubarItem onClick={() => setTheme('system')}>System</MenubarItem>
-          </MenubarContent>
-        </MenubarMenu>
-        <MenubarMenu>
-          <MenubarTrigger>
-            <Languages className="h-4 w-4 " />
-          </MenubarTrigger>
-          <MenubarContent>
-            {['en', 'fa'].map((language) => (
-              <MenubarItem
-                key={language}
-                onClick={() => changeLanguage(language)}
-              >
-                {t(`languages.${language}`)}
-              </MenubarItem>
-            ))}
-          </MenubarContent>
-        </MenubarMenu>
+      <Menubar className="w-full border-none">
+        <Avatar src={user.imageUrl} name={user.name} size="sm" />
         <MenubarMenu>
           <MenubarTrigger>File</MenubarTrigger>
           <MenubarContent>
@@ -84,8 +65,8 @@ export function MenubarDemo() {
               </MenubarSubContent>
             </MenubarSub>
             <MenubarSeparator />
-            <MenubarItem>
-              Print... <MenubarShortcut>⌘P</MenubarShortcut>
+            <MenubarItem onSelect={() => onOpen('upload')}>
+              Uploads <MenubarShortcut>⌘P</MenubarShortcut>
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>
@@ -116,27 +97,39 @@ export function MenubarDemo() {
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-          <MenubarTrigger>View</MenubarTrigger>
+          <MenubarTrigger>Settings</MenubarTrigger>
           <MenubarContent>
-            <MenubarCheckboxItem>Always Show Bookmarks Bar</MenubarCheckboxItem>
-            <MenubarCheckboxItem checked>
-              Always Show Full URLs
-            </MenubarCheckboxItem>
-            <MenubarSeparator />
-            <MenubarItem inset>
-              Reload <MenubarShortcut>⌘R</MenubarShortcut>
-            </MenubarItem>
-            <MenubarItem disabled inset>
-              Force Reload <MenubarShortcut>⇧⌘R</MenubarShortcut>
-            </MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem inset>Toggle Fullscreen</MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem inset>Hide Sidebar</MenubarItem>
+            <MenubarSub>
+              <MenubarSubTrigger>Language</MenubarSubTrigger>
+              <MenubarSubContent>
+                {['en', 'fa'].map((language) => (
+                  <MenubarItem
+                    key={language}
+                    onClick={() => changeLanguage(language)}
+                  >
+                    {t(`languages.${language}`)}
+                  </MenubarItem>
+                ))}
+              </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSub>
+              <MenubarSubTrigger>Theme</MenubarSubTrigger>
+              <MenubarSubContent>
+                {themes.map((theme) => (
+                  <MenubarCheckboxItem
+                    checked={theme === currentTheme}
+                    key={theme}
+                    onClick={() => setTheme(theme)}
+                  >
+                    {theme}
+                  </MenubarCheckboxItem>
+                ))}
+              </MenubarSubContent>
+            </MenubarSub>
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-          <MenubarTrigger>Profiles</MenubarTrigger>
+          <MenubarTrigger>profile</MenubarTrigger>
           <MenubarContent>
             <MenubarRadioGroup value="benoit">
               <MenubarRadioItem value="andy">Andy</MenubarRadioItem>
@@ -150,6 +143,7 @@ export function MenubarDemo() {
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
+      <Separator />
     </div>
   );
 }

@@ -1,82 +1,83 @@
 import { MenubarDemo } from '@/components/MenubarDemo';
 import { ModalProvider } from '@/components/providers/modals.provider';
-import { Button } from '@/components/ui/button';
-import { useModal } from '@/hooks/use-modal.hook';
-import { useToken } from '@/hooks/use-token';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable';
 import { useUpload } from '@/hooks/use-upload';
+import { myAgencyAgents, whoAmI } from '@/lib/query-options';
 import { notificationService } from '@/services/notification.service';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { FileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
-import { Minimize2, Upload, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { Avatar } from '@nextui-org/react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { FileRoute, Outlet, redirect, Link } from '@tanstack/react-router';
 
 export const Route = new FileRoute('/_auth').createRoute({
-  // Before loading, authenticate the user via our auth context
-  // This will also happen during prefetching (e.g. hovering over links, etc)
   beforeLoad: ({ context, location }) => {
-    // If the user is logged out, redirect them to the login page
+    const auth = context.auth;
 
-    const accessToken = context.auth.token?.accessToken;
-
-    if (!accessToken) {
+    if (!auth.token?.accessToken) {
       throw redirect({
-        to: '/login',
+        to: '/login/request-code',
         search: {
-          // Use the current location to power a redirect after login
-          // (Do not use `router.state.resolvedLocation` as it can
-          // potentially lag behind the actual current location)
           redirect: location.href,
         },
       });
     }
-
-    // Otherwise, return the user in context
-    return {
-      username: 'majid zahedi',
-    };
+  },
+  loader: async ({ context, navigate }) => {
+    const { data } = await context.queryClient.ensureQueryData(whoAmI());
+    await context.queryClient.ensureQueryData(myAgencyAgents());
+    if (data.isFirstLogin) {
+      navigate({
+        to: 'firstLogin',
+      });
+    }
   },
   component: RootComponent,
 });
 
 export function RootComponent() {
-  const { auth } = Route.useRouteContext();
-  const { onOpen } = useModal();
-
-  const { token } = useToken();
+  const whoAmIQuery = useSuspenseQuery(whoAmI());
+  const myAgencyAgentsQuery = useSuspenseQuery(myAgencyAgents());
+  const user = whoAmIQuery.data;
+  const agencies = myAgencyAgentsQuery.data;
 
   useUpload();
   notificationService();
 
-  useEffect(() => {
-    auth.setToken(token);
-  }, [token]);
-
   return (
-    <main className="flex min-h-[100dvh] w-full ">
+    <main className="flex min-h-[100dvh] w-full flex-col">
       <ModalProvider />
-      <MenubarDemo />
-      <div className="fixed right-0 top-0 flex h-9 items-center  ">
-        <Button variant="ghost">
-          <Minimize2 className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          className="rounded-br-none rounded-tl-none hover:bg-destructive hover:text-destructive-foreground"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-      <Outlet />
-      <Button
-        size="icon"
-        onClick={() => onOpen('upload')}
-        className="fixed bottom-2 left-2 h-7 w-7 rounded-full"
+      <MenubarDemo user={user} />
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="max-h-[calc(100dvh-41px)]"
       >
-        <Upload className="h-4 w-4" />
-      </Button>
-      <TanStackRouterDevtools />
-      <ReactQueryDevtools />
+        <ResizablePanel>
+          <div className="flex flex-col space-y-4 p-2">
+            {agencies.map((agent) => (
+              <Link
+                to="/$agencyId"
+                params={{ agencyId: agent.agency.agencyId }}
+                className="flex items-center space-x-4"
+                key={agent.id}
+              >
+                <Avatar src={agent.agency.imageUrl} name={agent.agency.name} />
+                <p>{agent.agency.name}</p>
+                <p>{agent.role}</p>
+              </Link>
+            ))}
+          </div>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel
+          defaultSize={80}
+          className="h-[calc(100dvh-41px)] w-full"
+        >
+          <Outlet />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </main>
   );
 }

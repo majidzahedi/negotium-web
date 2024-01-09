@@ -22,17 +22,23 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import { useToken } from '@/hooks/use-token';
 import { api } from '@/lib/axios';
-import { FileRoute, useNavigate } from '@tanstack/react-router';
+import { FileRoute, redirect, useRouter } from '@tanstack/react-router';
 
 const verifyCodeSchema = z.object({
   mobile: z.string().catch(''),
+  redirect: z.string().optional(),
 });
 
-type VerifyCodeSearch = z.infer<typeof verifyCodeSchema>;
-
 export const Route = new FileRoute('/login/verify-code').createRoute({
+  beforeLoad: ({ context, search }) => {
+    if (!!context.auth.token?.accessToken && !!search.redirect) {
+      // @ts-ignore
+      throw redirect({
+        to: search.redirect,
+      });
+    }
+  },
   component: VerifyCode,
   validateSearch: verifyCodeSchema,
 });
@@ -52,10 +58,8 @@ const FormSchema = z.object({
 function VerifyCode() {
   const { mobile } = Route.useSearch();
   const { auth } = Route.useRouteContext();
-  // const { setToken, token } = auth;
+  const router = useRouter();
 
-  const navigate = useNavigate();
-  // const { setToken, token } = useToken();
   const { mutate } = useMutation({
     mutationKey: ['login'],
     mutationFn: (body: z.infer<typeof FormSchema>) =>
@@ -64,11 +68,7 @@ function VerifyCode() {
       auth?.setToken(data.data);
     },
     onSettled: () => {
-      if (auth?.token?.accessToken) {
-        navigate({
-          to: '/',
-        });
-      }
+      router.invalidate();
     },
     onError: (e) => {
       form.setError('mobile', { message: e.message });

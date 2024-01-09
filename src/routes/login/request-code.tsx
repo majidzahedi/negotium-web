@@ -23,10 +23,16 @@ import {
 } from '@/components/ui/form';
 
 import { api } from '@/lib/axios';
-import { FileRoute, useNavigate } from '@tanstack/react-router';
+import { FileRoute, useNavigate, useRouter } from '@tanstack/react-router';
+import { useLayoutEffect } from 'react';
+
+const requestCodeSchema = z.object({
+  redirect: z.string().optional(),
+});
 
 export const Route = new FileRoute('/login/request-code').createRoute({
   component: RequestCode,
+  validateSearch: requestCodeSchema,
 });
 
 interface loginResponse {
@@ -42,12 +48,16 @@ const FormSchema = z.object({
 
 function RequestCode() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
+  const { auth } = Route.useRouteContext();
+  const router = useRouter();
+
   const { mutate } = useMutation({
     mutationKey: ['request-code'],
     mutationFn: (body: z.infer<typeof FormSchema>) =>
       api.post<loginResponse>('auth/code', body),
     onSuccess: (_, { mobile }) => {
-      navigate({ to: `/login/verify-code`, search: { mobile } });
+      navigate({ to: `/login/verify-code`, search: { mobile, redirect } });
     },
     onError: (e) => {
       form.setError('mobile', { message: e.message });
@@ -60,6 +70,12 @@ function RequestCode() {
       mobile: '',
     },
   });
+
+  useLayoutEffect(() => {
+    if (auth.token?.accessToken && !!redirect) {
+      router.history.push(redirect);
+    }
+  }, [auth.token?.accessToken, redirect]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast.message('You submitted the following values:', {

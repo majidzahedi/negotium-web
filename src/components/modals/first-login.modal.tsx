@@ -32,6 +32,7 @@ import { cn } from '@nextui-org/react';
 import { AvatarDropzone } from '../drop-zones/avatar.drop-zone';
 import { useApiAuth } from '@/hooks/use-api-auth';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
 
 const firstLoginReqSchema = z.object({
   name: z.string().min(3),
@@ -39,6 +40,7 @@ const firstLoginReqSchema = z.object({
 });
 
 export const FirstLoginModal = () => {
+  const router = useRouter();
   const api = useApiAuth();
   const { isOpen, type, onClose } = useModal();
   const open = isOpen && type === 'FirstLoginModal';
@@ -64,12 +66,17 @@ export const FirstLoginModal = () => {
       onSuccess(data) {
         console.log(data);
       },
+      onSettled() {
+        router.navigate({
+          to: '/',
+        });
+      },
     });
   };
 
   if (!isDesktop)
     return (
-      <Drawer open={open} onOpenChange={(value) => value !== open && onClose()}>
+      <Drawer open={true} onOpenChange={(value) => value !== open && onClose()}>
         <DrawerContent className="px-8">
           <DrawerHeader>Hello Agent!</DrawerHeader>
           <DrawerDescription>Let's get to know you better :)</DrawerDescription>
@@ -83,7 +90,7 @@ export const FirstLoginModal = () => {
     );
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>Hello Agent!</DialogHeader>
         <DialogDescription>Let's get to know you better :)</DialogDescription>

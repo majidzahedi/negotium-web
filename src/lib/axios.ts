@@ -1,5 +1,4 @@
 import { useToken } from '@/hooks/use-token';
-import { store } from '@/store/simple-store.store';
 import axios from 'axios';
 
 export const api = axios.create({
@@ -20,13 +19,15 @@ const refreshToken = async () => {
 
     useToken.getState().setToken(result.data);
   } catch (error) {
-    useToken.getState().clearToken();
+    console.log(error);
+    if (error?.response?.status === 401) {
+      useToken.getState().clearToken();
+    }
   }
 };
 
 apiAuth.interceptors.request.use(
   function (config) {
-    console.log(store.getState().token);
     config.headers.Authorization = `Bearer ${useToken.getState().token
       ?.accessToken}`;
 
@@ -41,10 +42,6 @@ apiAuth.interceptors.response.use(
   (response) => response,
   async function (error) {
     const prevRequest = error?.config;
-
-    if (error?.response?.status === 400 && !prevRequest?.sent) {
-      console.log('error');
-    }
 
     if (error?.response?.status === 401 && !prevRequest?.sent) {
       prevRequest.sent = true;

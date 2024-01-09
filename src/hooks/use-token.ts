@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface AuthProp {
   token: Token | null;
-  setToken: (token: Token) => void;
+  setToken: (token: Token | null) => void;
   clearToken: () => void;
 }
 
